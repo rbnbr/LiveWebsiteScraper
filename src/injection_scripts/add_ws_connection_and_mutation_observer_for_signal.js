@@ -5,12 +5,12 @@ function createWebsocket(url) {
 }
 
 function parseValue(value_string) {
-    let v = value_string.innerText.slice(value_string.innerText.search(':')+1).replace(' ', '');
+    let v = value_string.slice(value_string.search(':')+1).replace(' ', '');
     return +v;
 }
 
 function parseTimeStamp(timestamp_string) {
-    let ts = timestamp_string.innerText.slice(timestamp_string.innerText.search(':')+1).replace(' ', '');
+    let ts = timestamp_string.slice(timestamp_string.search(':')+1).replace(' ', '');
     let [hms, ms] = ts.split('.');
     let [h, m, s] = hms.split(':');
 
@@ -25,6 +25,8 @@ function makeCallback(h1, h2, websocket, page_url) {
     let h2_ = h2;
     let ws = websocket;
     function callback(mutationList, observer){
+        console.log(h1_.innerHTML, h2_.innerHTML);
+
         const signal_result = {
             page_url: page_url,
             signal_element: {
@@ -58,7 +60,7 @@ function setup(pyapp_url, page_url) {
     const ws = createWebsocket(pyapp_url);
     let mutationObserver = createMutationObserver(ws, page_url);
 
-    const config = { attributes: true, childList: true, subtree: true };
+    const config = { characterData: true, subtree: true };
 
     // start observing
     mutationObserver.observer.observe(mutationObserver.target, config);

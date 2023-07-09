@@ -4,7 +4,7 @@ import time
 import dateutil.tz
 
 from src.data_elements.signal_element import SignalElement
-from src.abc.single_page_monitoring import SinglePageMonitoring, PYAPP_ADDR, WS_PORT
+from src.abc.single_page_monitoring import SinglePageMonitoring, WS_SERVER_ADDR, WS_PORT, WS_PROTOCOL
 from src.abc.driver_monitor import RemoteDriverManager
 from src.util import read_file_content, parse_timestamp, get_env_non_empty
 from dateutil.parser import ParserError
@@ -47,7 +47,8 @@ class RandomSignalSPM(SinglePageMonitoring):
         # execute script for observing signal
         script_content = read_file_content("./src/injection_scripts/"
                                            "add_ws_connection_and_mutation_observer_for_signal.js")
-        driver.execute_script(script_content, f"wss://{PYAPP_ADDR}:{WS_PORT}", self.page_url)
+
+        driver.execute_script(script_content, f"{WS_PROTOCOL}://{WS_SERVER_ADDR}:{WS_PORT}", self.page_url)
 
     def destroy(self):
         super().destroy()
@@ -109,20 +110,25 @@ class RandomSignalSPM(SinglePageMonitoring):
         :return:
         """
         # parse signal value and add
+        signal_element = signal_json["signal_element"]
+
         try:
-            timestamp = parse_timestamp(signal_json["timestamp"])
+            timestamp = parse_timestamp(signal_element["timestamp"])
             timestamp = timestamp.replace(tzinfo=timezone_berlin)
         except ParserError:
             # timestamp = None
             logger.warning(f"got signal with error parsing timestamp from page '{self.page_url}... "
-                           f"skip signal: {signal_json}")
+                           f"skip signal: {signal_element}")
             return
 
-        signal_value = int(float(''.join(filter(lambda c: c in "1234567890", signal_json["value"]))))
+        signal_value = signal_element["value"]
 
         signal_element = SignalElement(timestamp=timestamp, value=signal_value)
 
         k = self.make_key(signal_element)
         self._signal_data[k] = signal_element
-        self._last_signal_time_s = max(self._last_signal_time_s, int(signal_element.timestamp.timestamp()))
+        self._last_signal_time_s = time.time()
+
+        # NOTE: may break if container has different time zone
+        # self._last_signal_time_s = max(self._last_signal_time_s, int(signal_element.timestamp.timestamp()))
         # logger.debug(f"added signal element: {signal_element}")

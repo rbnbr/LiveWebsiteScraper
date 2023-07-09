@@ -31,19 +31,13 @@ RUN mkdir "logs"
 # add required files
 COPY main.py .
 
-COPY src/* src/
+COPY src/ src/
 
 # add firefox profiles
 COPY firefox_profiles firefox_profiles
 
 # specify firefox profile (path on the remote machine!, the profile has to exist on the remote machine of the selenium)
 ENV PYAPP_FIREFOX_PROFILE_DIR firefox_profiles/ff-profile.WithCACertificate
-
-# add scripts
-COPY src/injection_scripts src/scripts
-
-# pyapp url for the selenium driver to connect to this app's websocket
-ENV PYAPP_ADDR "live-data-scraper"
 
 # add default configs
 COPY *_config.json .
@@ -71,6 +65,9 @@ ENV MAX_PAGE_UNHEALTHY_REFRESH_IN_TIME_LIMIT 5
 # the max time in which unhealthy states are being tracked
 # should be enough time to trigger the unhealthy option
 ENV MAX_PAGE_UNHEALTHY_COUNT_AGE_S 3600
+
+# websocket host url (without port) for the selenium driver to connect to
+ENV WS_SERVER_ADDR "live-data-scraper"
 
 # the websocket port to be used
 ENV WS_PORT 8001

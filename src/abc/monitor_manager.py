@@ -82,20 +82,21 @@ class MonitorManager:
         self.postgres_connection = postgres_connection
         self.schema = schema
 
+        self.ws_port = ws_port
+        self._ws_ssl_context = ws_ssl_context
+
+        self.simulate_activity_interval_s = simulate_activity_interval_s
+
         self.driver_managers: dict[int, DriverManager] \
             = self.make_remote_driver_managers(self.browser_instances_n, self.headless, self.headless_first_override,
                                                max_time_for_retries_s=60)
 
         self.health_stati = dict()
 
-        self.ws_port = ws_port
-        self._ws_ssl_context = ws_ssl_context
         self._websocket_thread = None
         self._should_stop = False
 
         self._should_destroy = False
-
-        self.simulate_activity_interval_s = simulate_activity_interval_s
 
     def get_addresses(self):
         """
@@ -289,6 +290,12 @@ class MonitorManager:
         signal_results = {page_url: latest_page_results[page_url] for page_url in latest_page_results
                              if latest_page_results[page_url]["page_monitor_class"] is RandomSignalSPM}
 
+        # debug print
+        for page_url in signal_results:
+            psr = signal_results[page_url]
+            pd = psr['page_data']
+            logger.debug(f"pulled {len(pd)} signal results from page {page_url}")
+
         # handle signal results
         # try:
         #     with self.postgres_connection.cursor() as cur:
@@ -375,6 +382,10 @@ class MonitorManager:
             if use_profile:
                 # firefox_options.set_preference("profile", str(ff_profile_path))
                 firefox_options.profile = str(ff_profile_path)
+            else:
+                if not get_env_non_empty("WS_USE_SSL", default="False").lower() == "true":
+                    # allow firefox insecure websocket connection from https site
+                    firefox_options.set_preference('network.websocket.allowInsecureFromHTTPS', True)
 
             if headless_first_override is not None and i == 0:
                 firefox_options.headless = headless_first_override

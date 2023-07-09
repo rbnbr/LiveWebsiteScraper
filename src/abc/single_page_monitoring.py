@@ -13,8 +13,9 @@ from selenium.webdriver.common.window import WindowTypes
 
 logger = logging.getLogger("scraper_logger")
 
-PYAPP_ADDR = get_env_non_empty("PYAPP_ADDR", "live-data-scraper")
+WS_SERVER_ADDR = get_env_non_empty("WS_SERVER_ADDR", "live-data-scraper")
 WS_PORT = get_env_non_empty("WS_PORT", 8001)
+WS_PROTOCOL = "wss" if get_env_non_empty("WS_USE_SSL", default="False").lower() == "true" else "ws"
 
 
 class SinglePageMonitoring:
@@ -99,22 +100,6 @@ class SinglePageMonitoring:
     def get_total_refresh_count(self):
         return self._total_refresh_count
 
-    @staticmethod
-    def accept_check(dr: webdriver.Firefox):
-        """
-        Performs the accept check.
-        :param dr:
-        :return:
-        """
-        try:
-            acc = dr.find_elements(By.CLASS_NAME, "accept")
-            if len(acc) > 0 and acc[0].is_displayed():
-                acc[0].click()
-        except NoSuchElementException as e:
-            pass
-        except ElementNotInteractableException as e:
-            pass
-
     def after_refresh_callback(self, driver: webdriver.Firefox):
         """
         Is called during refresh_page() after the page has been loaded if it is not a default page
@@ -156,8 +141,6 @@ class SinglePageMonitoring:
 
             # if not default page
             if self.page_url != "about:logo":
-                self.accept_check(driver)
-
                 self.after_refresh_callback(driver)
 
             self.redirect_url = driver.current_url

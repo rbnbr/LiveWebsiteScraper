@@ -23,7 +23,8 @@ services:
     environment:
       - SEL_DRIVER_ADDR_1=http://172.30.0.151:4444
       - WS_PORT=8001
-      - WS_USE_SSL=True
+      - WS_USE_SSL=False
+      - WS_SERVER_ADDR=live-data-scraper
       - TZ=Europe/Berlin
     depends_on: #
       - "browser-1"
