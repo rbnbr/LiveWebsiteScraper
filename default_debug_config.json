@@ -1,0 +1,9 @@
+{
+  "push_interval_s": 15,
+  "update_tabs_interval_s": 300,
+  "browser_instances_n": 1,
+  "headless": true,
+  "headless_first_override": false,
+  "health_check_interval_s": 45,
+  "simulate_activity_interval_s": 30
+}

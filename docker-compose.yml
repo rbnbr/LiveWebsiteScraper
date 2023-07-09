@@ -1,0 +1,54 @@
+---
+version: "3.9"
+
+services:
+  browser-1:
+    image: "selenium/standalone-firefox"
+    container_name: "firefox-cnt-1"
+      #- SE_START_XVFB=false
+    networks:
+      scrapnet:
+        ipv4_address: 172.30.0.151
+    ports:
+      - 7900:7900  # vnc server for testing
+      - 4444:4444
+    volumes:
+      - browser-1-storage:/dev/shm
+
+  live-data-scraper:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    container_name: live-data-scraper
+    environment:
+      - SEL_DRIVER_ADDR_1=http://172.30.0.151:4444
+      - WS_PORT=8001
+      - WS_USE_SSL=True
+      - TZ=Europe/Berlin
+    depends_on: #
+      - "browser-1"
+    networks:
+      scrapnet:
+        ipv4_address: 172.30.0.161
+    secrets:
+      - postgres_credentials
+      - cert.key
+    restart: unless-stopped
+    # entrypoint: ["tail", "-f", "/dev/null"]  # debug
+
+networks:
+  scrapnet:
+    name: scrapnet
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1
+secrets:
+  postgres_credentials:
+    file: ./secure/postgres_credentials.txt
+  cert.key:
+    file: ./secure/tls-ssl/cert.key
+
+volumes:
+  browser-1-storage:
