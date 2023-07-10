@@ -42,6 +42,14 @@ This example contains additional utilities that I use in the original project:
 The current example collects artificial data from my github.io page: [https://rbnbr.github.io/random-signal](https://rbnbr.github.io/random-signal).
 You can run the example via docker compose: ``docker compose up`` (optionally ``-d``).
 
+The docker compose file also expects two secrets, though, since they are not leveraged at the moment, it is enough to create two empty files in the appropriate location for that:
+```
+mkdir secure
+mkdir secure/tls-ssl
+echo "" > secure/postgres_credentials.txt
+echo "" > secure/tls-ssl/cert.key
+```
+
 If you want to run it locally, make sure to set the environment variables accordingly.
 See the settings in the [docker-compose.yml](./docker-compose.yml) and [Dockerfile](./Dockerfile) for a description of the environment variables.
 
