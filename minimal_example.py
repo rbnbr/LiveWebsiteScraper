@@ -21,15 +21,12 @@ driver.get(target_url)
 
 # Step 2: Run a WebSocket server which should collect and further process the data
 websocket_port = 8001
-i = 0
 stop = False
 
 
 async def websocket_callback(websocket):
     print("waiting for messages")
     async for message in websocket:
-        global i
-        i += 1
         print(message)
 
 
