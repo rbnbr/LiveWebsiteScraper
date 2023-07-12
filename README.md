@@ -20,14 +20,26 @@ There are four steps involved:
 1. Leverage Selenium (or other software to control a browser) to open the live updated webpage to monitor.
 2. Run a WebSocket server which should collect and further process the data
 3. Inject JavaScript to the webpage via, e.g., Selenium (step 1) which does the following:
-   4. Create a WebSocket object and open a connection to the WebSocket Server (from step 2)
-   5. Create MutationObserver object(s) to monitor the data to be retrieved, with a callback, which sends the new data to the WebSocket
+   - Create a WebSocket object and open a connection to the WebSocket Server (from step 2)
+   - Create MutationObserver object(s) to monitor the data to be retrieved, with a callback, which sends the new data to the WebSocket
 6. Process the data in the application, e.g., by aggregating specific values and storing them in a database.
 
 In general, it is quite simple and its implementation here is much more complex than necessary, which is due to the projects' origin as described above.
 
-## Additional Features Of This Example
-This example contains additional utilities that I use in the original project:
+A minimal example of this concept can be found here: [minimal_example.py](./minimal_example.py).
+
+The steps to run the minimal example are the following:
+````
+pip install webdriver-manager selenium websockets
+python minimal_example.py
+````
+
+You may use and adjust the minimal example as required.
+Alternatively, you may also try to run the provided project which already implements additional features for more robustness and the management of many tabs.
+
+
+## Additional Features Of The Provided Project
+The project contains additional utilities that I use in the original project:
 - Classes which try to abstract from the selenium driver object to..
   - Handle individual pages
   - Handle individual remote selenium instances (which in itself handle multiple pages)
@@ -38,9 +50,9 @@ This example contains additional utilities that I use in the original project:
   - Simulate activity
   - Bundle collected data and commonly process it by, e.g., pushing it to a database
 
-## Running The Example
-The current example collects artificial data from my github.io page: [https://rbnbr.github.io/random-signal](https://rbnbr.github.io/random-signal).
-You can run the example via docker compose: ``docker compose up`` (optionally ``-d``).
+## Running The Project
+The current project collects artificial data from my github.io page: [https://rbnbr.github.io/random-signal](https://rbnbr.github.io/random-signal).
+You can run the project via docker compose: ``docker compose up`` (optionally ``-d``).
 
 The docker compose file also expects two secrets, though, since they are not leveraged at the moment, it is enough to create two empty files in the appropriate location for that:
 ```
@@ -55,8 +67,8 @@ See the settings in the [docker-compose.yml](./docker-compose.yml) and [Dockerfi
 
 Some settings are also configured via the configuration files [default_config.json](./default_config.json) and [default_debug_config.json](./default_debug_config.json).
 
-## Adjusting The Example
-To adjust the example to monitor a different website you most likely have to do the following steps:
+## Adjusting The Project
+To adjust the project to monitor a different website you most likely have to do the following steps:
 - Create a new page monitor that handles opening the website (page), refresh actions, health check, simulate activity, and first processing of the incoming data.
   You may use the existing [RandomSignalPageMonitor](./src/page_monitors/random_signal_spm.py) as reference.
 - Create a new injection script corresponding to the new website layout and the data format the page monitor expects.
@@ -65,5 +77,3 @@ To adjust the example to monitor a different website you most likely have to do 
 - Adjust the [monitor manager](./src/abc/monitor_manager.py) (or inherit) to open the correct tabs by updating (or overriding) the ``update_tabs`` method.
   - Also configure the ``push_results`` method accordingly to handle the new type of data from the new page manager.
 
-## TODOs
-- Add a minimal working example.
