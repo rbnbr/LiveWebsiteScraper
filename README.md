@@ -41,9 +41,9 @@ Alternatively, you may also try to run the provided project which already implem
 ## Additional Features Of The Provided Project
 The project contains additional utilities that I use in the original project:
 - Classes which try to abstract from the selenium driver object to..
-  - Handle individual pages
-  - Handle individual remote selenium instances (which in itself handle multiple pages)
-  - Handle multiple drivers
+  - Handle a single page
+  - Handle a single remote selenium instance (which in itself handle multiple pages)
+  - Handle multiple drivers (remote selenium instances)
 - A run loop to
   - Update tabs (in case some tabs were closed unexpectedly, or the webpages we want to monitor depend on other dynamic factors, conditions, ...)
   - Check health status of pages (and issue page refresh if unhealthy)
